@@ -1,0 +1,24 @@
+@reference "../../../../styles.css";
+
+/* Grid responsivo de 2 columnas */
+.form-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4;
+}
+
+.field {
+  @apply flex flex-col gap-1;
+}
+
+.full {
+  @apply sm:col-span-2;
+}
+
+.actions {
+  @apply flex justify-end gap-2 pt-2 sm:col-span-2;
+}
+
+::ng-deep .p-inputtext,
+::ng-deep .p-password input,
+::ng-deep .p-multiselect {
+  @apply w-full;
+}

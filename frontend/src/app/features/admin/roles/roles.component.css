@@ -1,0 +1,7 @@
+@reference "../../../../styles.css";
+
+/* Asegurar ancho completo en PrimeNG inputs */
+::ng-deep .p-inputtext,
+::ng-deep .p-multiselect {
+  width: 100%;
+}

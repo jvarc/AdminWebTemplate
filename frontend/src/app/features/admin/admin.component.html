@@ -1,0 +1,34 @@
+<div class="page">
+  <header-component></header-component>
+  <br />
+  <div class="wrap">
+    <header class="head">
+      <h1 class="title">Administración</h1>
+      <p class="subtitle">Resumen general del sistema</p>
+    </header>
+
+    <section class="grid">
+      <article class="card">
+        <h2 class="card-title">Usuarios</h2>
+        <p class="card-text">Total, activos, bloqueados…</p>
+        <button class="btn-primary" routerLink="users">Gestionar</button>
+      </article>
+
+      <article class="card">
+        <h2 class="card-title">Roles</h2>
+        <p class="card-text">Permisos y políticas</p>
+        <button class="btn-primary" routerLink="roles">Configurar</button>
+      </article>
+
+      <article class="card">
+        <h2 class="card-title">Estado</h2>
+        <p class="card-text">Métricas y health checks</p>
+        <button class="btn-primary" routerLink="/dashboard">
+          Ver detalles
+        </button>
+      </article>
+    </section>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

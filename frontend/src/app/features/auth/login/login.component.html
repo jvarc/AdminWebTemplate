@@ -1,0 +1,58 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <i class="pi pi-user login-icon"></i>
+      <h2 class="login-title">Bienvenido</h2>
+      <p class="login-subtitle">Inicia sesión para continuar</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+      @if (errorMsg) {
+      <div
+        class="p-2 rounded bg-red-50 text-red-700 border border-red-200 text-sm"
+      >
+        {{ errorMsg }}
+      </div>
+      }
+      <div>
+        <label for="email" class="login-label">Usuario</label>
+        <input pInputText id="email" type="email" formControlName="email" />
+        @if (form.get('email')?.touched && form.get('email')?.invalid) {
+        <small class="error-text"> El usuario es obligatorio </small>
+        }
+      </div>
+
+      <div>
+        <label for="password" class="login-label">Contraseña</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [toggleMask]="true"
+          [feedback]="false"
+        ></p-password>
+        @if (form.get('password')?.touched && form.get('password')?.invalid) {
+        <small class="error-text"> La contraseña es obligatoria </small>
+        }
+      </div>
+
+      <button
+        pButton
+        type="submit"
+        label="Iniciar sesión"
+        class="login-button"
+      ></button>
+
+      <div class="divider">
+        <span>o</span>
+      </div>
+
+      <button
+        pButton
+        type="button"
+        label="Registrarse"
+        severity="secondary"
+        class="register-button"
+      ></button>
+    </form>
+  </div>
+</div>

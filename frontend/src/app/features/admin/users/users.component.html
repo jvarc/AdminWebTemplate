@@ -1,0 +1,158 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<br />
+
+<div class="flex justify-between items-center mb-4">
+  <h2 class="text-xl font-semibold">Usuarios</h2>
+  <button
+    pButton
+    label="Nuevo usuario"
+    icon="pi pi-plus"
+    (click)="openCreate()"
+  ></button>
+</div>
+
+<p-table [value]="users" [loading]="loading" dataKey="userId" class="w-full">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Usuario</th>
+      <th>Roles</th>
+      <th class="text-right">Estado</th>
+      <th class="text-right">Acciones</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-u>
+    <tr>
+      <td>{{ u.userName }}</td>
+
+      <td>
+        @if (u.roles?.length) {
+        <ng-container>
+          <p-tag
+            *ngFor="let r of u.roles"
+            [value]="r"
+            class="mr-1 mb-1"
+          ></p-tag>
+        </ng-container>
+        } @else {
+        <span class="text-gray-500">Sin roles</span>
+        }
+      </td>
+
+      <td class="text-right">
+        <p-tag
+          [value]="u.isInactive ? 'Inactivo' : 'Activo'"
+          [severity]="u.isInactive ? 'warn' : 'success'"
+        >
+        </p-tag>
+      </td>
+
+      <td class="text-right">
+        <p-button
+          icon="pi pi-pencil"
+          class="mr-2"
+          (click)="openEdit(u)"
+        ></p-button>
+        <p-button
+          [icon]="u.isInactive ? 'pi pi-lock-open' : 'pi pi-lock'"
+          [severity]="u.isInactive ? 'success' : 'warn'"
+          class="mr-2"
+          (click)="toggleActive(u)"
+        >
+        </p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog
+  [(visible)]="showForm"
+  [header]="mode === 'create' ? 'Crear usuario' : 'Editar usuario'"
+  [modal]="true"
+  [style]="{ width: '680px', maxWidth: '95vw' }"
+>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-grid">
+    <div class="field">
+      <label class="block mb-1 text-sm">Usuario</label>
+      <input pInputText formControlName="userName" />
+    </div>
+
+    <div class="field">
+      <label class="block mb-1 text-sm">Email</label>
+      <input pInputText formControlName="email" type="email" />
+      @if(form.get('email')?.touched && form.get('email')?.invalid){
+      <small class="error-text">Ingresa un email válido.</small>
+      }
+    </div>
+
+    @if (mode === 'create') {
+    <div class="field full">
+      <label class="block mb-1 text-sm">Contraseña</label>
+      <input pPassword formControlName="password" toggleMask="true" />
+    </div>
+
+    <div class="full">
+      <ul class="mt-2 text-xs list-disc ml-4">
+        <li
+          [class.text-green-600]="!form.get('password')?.errors?.['minLength']"
+        >
+          Mínimo 8 caracteres
+        </li>
+        <li
+          [class.text-green-600]="!form.get('password')?.errors?.['uppercase']"
+        >
+          Al menos 1 mayúscula
+        </li>
+        <li
+          [class.text-green-600]="!form.get('password')?.errors?.['lowercase']"
+        >
+          Al menos 1 minúscula
+        </li>
+        <li [class.text-green-600]="!form.get('password')?.errors?.['digit']">
+          Al menos 1 número
+        </li>
+        <li [class.text-green-600]="!form.get('password')?.errors?.['symbol']">
+          Al menos 1 símbolo
+        </li>
+      </ul>
+    </div>
+    }
+
+    <div class="field full">
+      <label class="block mb-1 text-sm">Roles</label>
+      <p-multiSelect
+        [options]="roles"
+        formControlName="roles"
+        optionLabel="roleName"
+        optionValue="roleName"
+        defaultLabel="Selecciona roles"
+        [display]="'chip'"
+        [filter]="true"
+        appendTo="body"
+        [panelStyle]="{ maxHeight: '260px' }"
+      >
+        <ng-template let-r pTemplate="item">{{ r.roleName }}</ng-template>
+        <ng-template let-r pTemplate="selectedItem">{{
+          r.roleName
+        }}</ng-template>
+      </p-multiSelect>
+    </div>
+
+    <div class="actions">
+      <button
+        pButton
+        type="button"
+        label="Cancelar"
+        severity="secondary"
+        (click)="showForm = false"
+      ></button>
+      <button
+        pButton
+        type="submit"
+        [label]="mode === 'create' ? 'Crear' : 'Guardar'"
+        [disabled]="form.invalid"
+      ></button>
+    </div>
+  </form>
+</p-dialog>

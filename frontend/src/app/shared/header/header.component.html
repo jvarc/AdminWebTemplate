@@ -1,0 +1,31 @@
+<header class="app-header">
+  <div class="header-inner">
+    <div class="brand" (click)="onClick()">
+      <i class="pi pi-bolt brand-icon"></i>
+      <span class="brand-text">AdminWebTemplate</span>
+    </div>
+
+    <div class="actions">
+      @if(!isLogged){
+      <p-button
+        label="Iniciar sesión"
+        icon="pi pi-sign-in"
+        class="login-btn"
+        (click)="login()"
+      ></p-button>
+      } @if(isLogged){
+      <ng-container>
+        <p-button
+          class="user-btn"
+          [label]="userName ?? 'Usuario'"
+          icon="pi pi-user"
+          iconPos="left"
+          (click)="toggleMenu($event)"
+        ></p-button>
+
+        <p-menu #userMenu [popup]="true" [model]="items"></p-menu>
+      </ng-container>
+      }
+    </div>
+  </div>
+</header>

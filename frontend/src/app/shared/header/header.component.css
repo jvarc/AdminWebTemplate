@@ -1,0 +1,33 @@
+@reference "../../../styles.css";
+
+.app-header {
+  @apply w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800;
+}
+
+.header-inner {
+  @apply mx-auto h-14 px-4 sm:px-6 flex items-center justify-between;
+}
+
+.brand {
+  @apply flex items-center gap-2 cursor-pointer select-none;
+}
+
+.brand-icon {
+  @apply text-primary text-xl;
+}
+
+.brand-text {
+  @apply font-semibold text-gray-900 dark:text-gray-100;
+}
+
+.actions {
+  @apply flex items-center gap-2;
+}
+
+.login-btn {
+  @apply px-3 py-2 text-sm font-medium;
+}
+
+.user-btn {
+  @apply px-3 py-2 text-sm font-medium;
+}
