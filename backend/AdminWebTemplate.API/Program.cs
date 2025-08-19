@@ -1,12 +1,15 @@
 using AdminWebTemplate.Infrastructure;
 using AdminWebTemplate.Infrastructure.Seed;
+using AdminWebTemplate.Infrastructure.Persistence;   
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;                
+using Microsoft.EntityFrameworkCore;                
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- JWT config & validaciones ---
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var issuer = jwtSection["Issuer"];
 var audience = jwtSection["Audience"];
@@ -20,6 +23,7 @@ if (keyRaw.Length < 32)
 
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyRaw));
 
+// --- CORS ---
 var cors = builder.Configuration.GetSection("Cors");
 var corsPolicyName = cors["PolicyName"] ?? "DefaultCors";
 var allowedOrigins = cors.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
@@ -37,7 +41,6 @@ builder.Services.AddCors(options =>
         }
         else
         {
-            // Desarrollo o ejemplo sin orígenes definidos
             p.AllowAnyOrigin()
              .AllowAnyHeader()
              .AllowAnyMethod();
@@ -45,12 +48,15 @@ builder.Services.AddCors(options =>
     });
 });
 
+// --- Infraestructura (DbContext/Identity configurable: SqlServer/Sqlite/SqliteInMemory) ---
 builder.Services.AddInfrastructure(builder.Configuration);
 
+// --- MVC + Swagger ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// --- AuthN/AuthZ ---
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
@@ -76,13 +82,43 @@ builder.Services.AddAuthorizationBuilder()
 
 var app = builder.Build();
 
+// --- Migraciones + Seeding + Demo (antes del pipeline) ---
+using (var scope = app.Services.CreateScope())
+{
+    var sp = scope.ServiceProvider;
+
+    var db = sp.GetRequiredService<ApplicationDbContext>();
+    if (db.Database.IsRelational())
+        await db.Database.MigrateAsync();
+
+    await IdentitySeeder.SeedAsync(sp);
+
+    // 3) Modo demo (opcional): crea admin efímero si no hay usuarios
+    var cfg = sp.GetRequiredService<IConfiguration>();
+    if (cfg.GetValue<bool>("Demo:Enabled"))
+    {
+        var userMgr = sp.GetRequiredService<UserManager<IdentityUser>>();
+        if (!userMgr.Users.Any())
+        {
+            var email = cfg["Demo:AdminEmail"] ?? "admin@demo.local";
+            var pass = cfg["Demo:AdminPassword"] ?? "Demo123$";
+
+            var u = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true, LockoutEnabled = false };
+            await userMgr.CreateAsync(u, pass);
+
+            var roleMgr = sp.GetRequiredService<RoleManager<IdentityRole>>();
+            if (!await roleMgr.RoleExistsAsync("Admin"))
+                await roleMgr.CreateAsync(new IdentityRole("Admin"));
+
+            await userMgr.AddToRoleAsync(u, "Admin");
+        }
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
-    using var scope = app.Services.CreateScope();
-    await IdentitySeeder.SeedAsync(scope.ServiceProvider);
 }
 else
 {
@@ -93,7 +129,5 @@ app.UseHttpsRedirection();
 app.UseCors(corsPolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllers(); 
-
+app.MapControllers();
 app.Run();
