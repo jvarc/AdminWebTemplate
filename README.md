@@ -11,15 +11,15 @@ Template full-stack listo para arrancar en 2 minutos:
 
 <p align="center">
   <a href="docs/preview/login.png">
-    <img src="docs/preview/login.png" alt="Login" width="30%">
+    <img src="docs/preview/login.png" alt="Login" width="60%">
   </a>
   <br/>
   <a href="docs/preview/admin-users.png">
-    <img src="docs/preview/admin-users.png" alt="Pantalla de usuarios del módulo Admin" width="60%">
+    <img src="docs/preview/admin-users.png" alt="Pantalla de usuarios del módulo Admin" width="90%">
   </a>
       <br/>
   <a href="docs/preview/roles-permisos.png">
-    <img src="docs/preview/roles-permisos.png" alt="Pantalla de roles y permisos" width="60%">
+    <img src="docs/preview/roles-permisos.png" alt="Pantalla de roles y permisos" width="90%">
   </a>
     <br/>
   <a href="docs/preview/navbar.png">
