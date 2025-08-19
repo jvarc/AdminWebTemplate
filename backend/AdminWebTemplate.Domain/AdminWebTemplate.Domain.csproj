@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Constants\**" />
+    <Compile Remove="Entities\**" />
+    <EmbeddedResource Remove="Constants\**" />
+    <EmbeddedResource Remove="Entities\**" />
+    <None Remove="Constants\**" />
+    <None Remove="Entities\**" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,6 @@
+@AdminWebTemplate.API_HostAddress = http://localhost:5137
+
+GET {{AdminWebTemplate.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

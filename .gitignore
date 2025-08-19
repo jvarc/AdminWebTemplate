@@ -1,18 +1,34 @@
-# --- Angular / Node (mono o multi-proyecto) ---
-**/dist/
-**/out-tsc/
-**/tmp/
-**/.angular/
-**/node_modules/
+# --- comunes ---
+*.log
+logs/
+*.dmp
 
-# --- Environments de Angular (no subir claves reales) ---
-# Ignora todos los .ts de environments...
-**/src/environments/*.ts
-# ...pero mantiene un ejemplo de referencia
-!**/src/environments/environment.example.ts
+# --- secretos y entornos 
+secrets.json
+.env
+.env.*
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/appsettings.Staging.json
 
-# --- IDE / SO ---
+# --- bases de datos y certs ---
+*.mdf
+*.ldf
+*.bak
+*.dacpac
+*.bacpac
+*.pfx
+*.snk
+*.key
+*.pem
+*.cer
+*.crt
+
+# --- IDE/build genéricos ---
+.vs/
 .vscode/
-.idea/
-.DS_Store
-Thumbs.db
+node_modules/
+dist/
+coverage/
+.angular/
+artifacts/
