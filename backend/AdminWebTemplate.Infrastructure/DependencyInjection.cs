@@ -37,7 +37,22 @@ namespace AdminWebTemplate.Infrastructure
                         break;
 
                     case "Sqlite":
-                        opt.UseSqlite(sqliteFileCs, b =>
+                        var builder = new SqliteConnectionStringBuilder(sqliteFileCs)
+                        {
+                            Cache = SqliteCacheMode.Shared,
+                            DefaultTimeout = 30
+                        };
+                        var sqliteConn = new SqliteConnection(builder.ToString());
+                        sqliteConn.Open();
+
+                        // Activar WAL (queda persistido en el archivo)
+                        using (var cmd = sqliteConn.CreateCommand())
+                        {
+                            cmd.CommandText = "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;";
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        opt.UseSqlite(sqliteConn, b =>
                             b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName));
                         break;
 

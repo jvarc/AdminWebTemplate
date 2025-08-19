@@ -55,3 +55,10 @@ packages/
 
 # Configuration transforms
 *.Transform.cs
+
+# SQLite solo en backend
+backend/**/*.db
+backend/**/*-wal
+backend/**/*-shm
+backend/**/*.sqlite
+backend/**/*.sqlite3

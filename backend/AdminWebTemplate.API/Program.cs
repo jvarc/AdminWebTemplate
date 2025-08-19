@@ -91,7 +91,7 @@ using (var scope = app.Services.CreateScope())
     var db = sp.GetRequiredService<ApplicationDbContext>();
     if (db.Database.IsRelational())
     {
-        if (string.Equals(provider, "SqliteInMemory", StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(provider, "Sqlite", StringComparison.OrdinalIgnoreCase))
             await db.Database.EnsureCreatedAsync();
         else
             await db.Database.MigrateAsync();

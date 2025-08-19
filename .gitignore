@@ -32,3 +32,11 @@ dist/
 coverage/
 .angular/
 artifacts/
+
+# SQLite (BD + WAL/SHM)
+*.db
+*.sqlite
+*.sqlite3
+*-wal
+*-shm
+
