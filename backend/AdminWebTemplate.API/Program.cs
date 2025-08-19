@@ -1,9 +1,9 @@
 using AdminWebTemplate.Infrastructure;
 using AdminWebTemplate.Infrastructure.Seed;
-using AdminWebTemplate.Infrastructure.Persistence;   
+using AdminWebTemplate.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;                
-using Microsoft.EntityFrameworkCore;                
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -86,10 +86,16 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var sp = scope.ServiceProvider;
+    var provider = builder.Configuration["Database:Provider"] ?? "SqlServer";
 
     var db = sp.GetRequiredService<ApplicationDbContext>();
     if (db.Database.IsRelational())
-        await db.Database.MigrateAsync();
+    {
+        if (string.Equals(provider, "SqliteInMemory", StringComparison.OrdinalIgnoreCase))
+            await db.Database.EnsureCreatedAsync();
+        else
+            await db.Database.MigrateAsync();
+    }
 
     await IdentitySeeder.SeedAsync(sp);
 
@@ -98,20 +104,33 @@ using (var scope = app.Services.CreateScope())
     if (cfg.GetValue<bool>("Demo:Enabled"))
     {
         var userMgr = sp.GetRequiredService<UserManager<IdentityUser>>();
-        if (!userMgr.Users.Any())
+
+        var email = cfg["Demo:AdminEmail"] ?? "admin@demo.local";
+        var pass = cfg["Demo:AdminPassword"] ?? "Demo123$";
+
+        var user = await userMgr.FindByEmailAsync(email);
+        if (user == null)
         {
-            var email = cfg["Demo:AdminEmail"] ?? "admin@demo.local";
-            var pass = cfg["Demo:AdminPassword"] ?? "Demo123$";
-
-            var u = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true, LockoutEnabled = false };
-            await userMgr.CreateAsync(u, pass);
-
-            var roleMgr = sp.GetRequiredService<RoleManager<IdentityRole>>();
-            if (!await roleMgr.RoleExistsAsync("Admin"))
-                await roleMgr.CreateAsync(new IdentityRole("Admin"));
-
-            await userMgr.AddToRoleAsync(u, "Admin");
+            user = new IdentityUser { UserName = email, Email = email, EmailConfirmed = true, LockoutEnabled = false };
+            var created = await userMgr.CreateAsync(user, pass); // crea con hash correcto
+            if (!created.Succeeded)
+                throw new InvalidOperationException("Demo admin creation failed: " + string.Join(", ", created.Errors.Select(e => e.Description)));
         }
+        else
+        {
+            // Asegura la contraseña demo sin tokens
+            if (await userMgr.HasPasswordAsync(user))
+            {
+                var removed = await userMgr.RemovePasswordAsync(user);
+                if (!removed.Succeeded)
+                    throw new InvalidOperationException("RemovePassword failed: " + string.Join(", ", removed.Errors.Select(e => e.Description)));
+            }
+
+            var added = await userMgr.AddPasswordAsync(user, pass);
+            if (!added.Succeeded)
+                throw new InvalidOperationException("AddPassword failed: " + string.Join(", ", added.Errors.Select(e => e.Description)));
+        }
+
     }
 }
 
