@@ -1,6 +1,5 @@
 ### 📄 `backend/README.md`
 
-````md
 # AdminWebTemplate – Backend (.NET 8 Web API)
 
 ## Tech
@@ -28,73 +27,93 @@
     "DefaultConnection": "__READ_FROM_USER_SECRETS__",
     "SqliteFile": "Data Source=admin.db"
   },
-  "Database": { "Provider": "SqliteInMemory" },  // SqliteInMemory | Sqlite | SqlServer
-  "Jwt": { "Issuer": "AdminWebTemplate", "Audience": "AdminWebTemplateUsers", "Key": "__READ_FROM_USER_SECRETS__", "ExpireMinutes": 60 },
-  "Cors": { "PolicyName": "AllowAdminWebTemplateFrontend", "AllowedOrigins": [ "http://localhost:4200" ] },
+  "Database": { "Provider": "SqliteInMemory" }, // SqliteInMemory | Sqlite | SqlServer
+  "Jwt": {
+    "Issuer": "AdminWebTemplate",
+    "Audience": "AdminWebTemplateUsers",
+    "Key": "__READ_FROM_USER_SECRETS__",
+    "ExpireMinutes": 60
+  },
+  "Cors": {
+    "PolicyName": "AllowAdminWebTemplateFrontend",
+    "AllowedOrigins": ["http://localhost:4200"]
+  },
   "Identity": {
     "Seed": {
-      "Roles": [ "Admin", "Manager", "User" ],
+      "Roles": ["Admin", "Manager", "User"],
       "RoleClaims": {
-        "Admin":   [ "admin:access", "users:read", "users:write" ],
-        "Manager": [ "users:read" ],
-        "User":    []
+        "Admin": ["admin:access", "users:read", "users:write"],
+        "Manager": ["users:read"],
+        "User": []
       }
     }
   },
-  "Demo": { "Enabled": true, "AdminEmail": "admin@demo.local", "AdminPassword": "Demo123$" }
+  "Demo": {
+    "Enabled": true,
+    "AdminEmail": "admin@demo.local",
+    "AdminPassword": "Demo123$"
+  }
 }
-User Secrets (desarrollo)
+```
+
+## User Secrets (desarrollo)
+
 Visual Studio → Manage User Secrets:
 
 json
 Copiar
 Editar
+
+```json
 {
   "Jwt": { "Key": "AL_MENOS_32_CARACTERES" },
   "ConnectionStrings": {
     "DefaultConnection": "Server=...;Database=...;User Id=...;Password=...;TrustServerCertificate=True"
   }
 }
-Proveedores de base de datos
-SqliteInMemory (demo): EnsureCreated() en startup, sin migraciones, datos efímeros.
+```
 
-Sqlite (archivo): persistencia local (admin.db), WAL habilitado para concurrencia.
+## Proveedores de base de datos
 
-SqlServer: producción; usa DefaultConnection en secrets.
+#### SqliteInMemory (demo): EnsureCreated() en startup, sin migraciones, datos efímeros.
 
-Si usas persistencia, añade/usa migraciones (Infrastructure/Migrations).
+#### Sqlite (archivo): persistencia local (admin.db), WAL habilitado para concurrencia.
 
-Endpoints principales
-POST /api/auth/login → { email, password } ⇒ { token, claims }
+#### SqlServer: producción; usa DefaultConnection en secrets.
 
-GET /api/users (perm users:read)
+#### Si usas persistencia, añade/usa migraciones (Infrastructure/Migrations).
 
-POST /api/users (perm users:write)
+## Endpoints principales
 
-PUT /api/users/{id}/activate|deactivate (perm users:write)
+#### POST /api/auth/login → { email, password } ⇒ { token, claims }
 
-GET /api/roles (perm users:read)
+#### GET /api/users (perm users:read)
 
-GET /api/roles/permissions (perm users:read) → lista de perm
+#### POST /api/users (perm users:write)
 
-Seguridad
+#### PUT /api/users/{id}/activate|deactivate (perm users:write)
+
+#### GET /api/roles (perm users:read)
+
+#### GET /api/roles/permissions (perm users:read) → lista de perm
+
+## Seguridad
+
 Nunca publiques Jwt:Key ni cadenas reales.
 
-.gitignore ignora SQLite (*.db, *-wal, *-shm), appsettings.*.json de entornos, certs, etc.
+#### .gitignore ignora SQLite (_.db, _-wal, _-shm), appsettings._.json de entornos, certs, etc.
 
 Para dominios reales en CORS, configúralos por entorno (no en el repo).
 
-EF Core (si eliges persistencia)
-bash
+## EF Core (si eliges persistencia)
+
+#### (opcional) crear migración inicial
+
 Copiar
 Editar
-# (opcional) crear migración inicial
+
+```bash
+pgsql
 dotnet ef migrations add InitialCreate -p AdminWebTemplate.Infrastructure -s AdminWebTemplate.API -o Migrations
 dotnet ef database update -p AdminWebTemplate.Infrastructure -s AdminWebTemplate.API
-pgsql
-Copiar
-Editar
-
-
 ```
-````
